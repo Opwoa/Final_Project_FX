@@ -1,3 +1,4 @@
+package sample;
 //http://docs.oracle.com/javase/8/javafx/user-interface-tutorial/ui_controls.htm#JFXUI336
 //http://docs.oracle.com/javase/8/javafx/api/
 import javafx.application.Application;
@@ -11,6 +12,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.*;
+import javafx.scene.*;
+import javafx.scene.paint.*;
+import javafx.scene.canvas.*;
 
 public class Main extends Application {
     private static final String OUTSIDE_TEXT = "Outside Label";
@@ -20,6 +24,7 @@ public class Main extends Application {
     @Override public void start(final Stage stage) {
         final Label reporter = new Label(OUTSIDE_TEXT);
         Label monitored = createMonitoredLabel(reporter);
+        Canvas canvas = createCanvas();
         ToolBar toolBar = new ToolBar(
                 new ToggleButton("New"),
                 new Button("Open"),
@@ -32,11 +37,12 @@ public class Main extends Application {
                 new Button("Debug"),
                 new Button("Profile")
         );
+
         VBox layout = new VBox(10);
         layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 20px;");
         layout.getChildren().setAll(
                 toolBar,
-                monitored,
+                canvas,
                 reporter
         );
         layout.setPrefWidth(600);
@@ -80,5 +86,37 @@ public class Main extends Application {
         });
 
         return monitored;
+    }
+
+    private Canvas createCanvas() {
+        final Canvas canvas = new Canvas(560, 400);
+        canvas.setStyle("-fx-background-color: lightpink;");
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLUE);
+        gc.setStroke(Color.ORANGE);
+        gc.strokeRect(75,75,100,100);
+
+        canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                gc.fillRect(event.getX(), event.getY(), 10, 10);
+            }
+        });
+
+        /*monitored.setOnMouseExited(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent event) {
+                reporter.setText(OUTSIDE_TEXT);
+            }
+        });
+
+        monitored.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Circle circle = new Circle(event.getX(), event.getX(), 5, Color.BLACK);
+            }
+        });*/
+
+        return canvas;
     }
 }
