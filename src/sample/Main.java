@@ -18,17 +18,21 @@ import javafx.scene.canvas.*;
 
 public class Main extends Application {
     private static final String OUTSIDE_TEXT = "Outside Label";
+    private static double iXCoor, iYCoor;
 
     public static void main(String[] args) { launch(args); }
 
     @Override public void start(final Stage stage) {
         final Label reporter = new Label(OUTSIDE_TEXT);
         Label monitored = createMonitoredLabel(reporter);
-        Canvas canvas = createCanvas();
-        ColorPicker colorPicker1 = new ColorPicker();
+        ColorPicker colorPicker1 = new ColorPicker(Color.BLACK);
+        ToggleButton raysTogg = new ToggleButton("Rays");
+        Button clearButt = new Button("Clear");
+        Canvas canvas = createCanvas(colorPicker1, clearButt, raysTogg);
+
         ToolBar toolBar = new ToolBar(
-                new ToggleButton("New"),
-                new Button("Open"),
+                raysTogg,  //Eventually have many options in a toggleGroup
+                clearButt,
                 new Button("Save"),
                 new Separator(Orientation.VERTICAL),
                 new Button("Clean"),
@@ -90,19 +94,38 @@ public class Main extends Application {
         return monitored;
     }
 
-    private Canvas createCanvas() {
+    private Canvas createCanvas(ColorPicker colorPicker1, Button clear, ToggleButton rays) {
         final Canvas canvas = new Canvas(560, 400);
-        canvas.setStyle("-fx-background-color: lightpink;");
-
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.BLUE);
-        gc.setStroke(Color.ORANGE);
-        gc.strokeRect(75,75,100,100);
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, 560, 400);
+        gc.setFill(colorPicker1.getValue());
+
+        clear.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                gc.setFill(Color.WHITE);
+                gc.fillRect(0, 0, 560, 400);
+            }
+        });
+
+        canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                iXCoor = event.getX();
+                iYCoor = event.getY();
+            }
+        });
 
         canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                gc.fillRect(event.getX(), event.getY(), 10, 10);
+                if (rays.isSelected() == true) {
+                    gc.setStroke(colorPicker1.getValue());
+                    gc.strokeLine(iXCoor, iYCoor, event.getX(), event.getY());
+                } else {
+                    gc.setFill(colorPicker1.getValue());
+                    gc.fillRect(event.getX(), event.getY(), 10, 10);
+                }
             }
         });
 
