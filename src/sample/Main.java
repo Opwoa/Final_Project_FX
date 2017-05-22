@@ -25,6 +25,7 @@ public class Main extends Application {
         final Label reporter = new Label(OUTSIDE_TEXT);
         Label monitored = createMonitoredLabel(reporter);
         Canvas canvas = createCanvas();
+        ColorPicker colorPicker1 = new ColorPicker();
         ToolBar toolBar = new ToolBar(
                 new ToggleButton("New"),
                 new Button("Open"),
@@ -35,16 +36,16 @@ public class Main extends Application {
                 new Button("Run"),
                 new Separator(Orientation.VERTICAL),
                 new Button("Debug"),
-                new Button("Profile")
+                new Button("Profile"),
+                colorPicker1
         );
-        ColorPicker colorPicker1 = new ColorPicker();
+
         VBox layout = new VBox(10);
         layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 20px;");
         layout.getChildren().setAll(
                 toolBar,
                 canvas,
-                reporter,
-                colorPicker1
+                reporter
         );
         layout.setPrefWidth(600);
 
