@@ -37,13 +37,14 @@ public class Main extends Application {
                 new Button("Debug"),
                 new Button("Profile")
         );
-
+        ColorPicker colorPicker1 = new ColorPicker();
         VBox layout = new VBox(10);
         layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 20px;");
         layout.getChildren().setAll(
                 toolBar,
                 canvas,
-                reporter
+                reporter,
+                colorPicker1
         );
         layout.setPrefWidth(600);
 
