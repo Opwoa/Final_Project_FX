@@ -29,14 +29,15 @@ public class Main extends Application {
         ColorPicker colorPickerBackground = new ColorPicker(Color.WHITE);
         ToggleButton raysTogg = new ToggleButton("Rays");
         Button clearButt = new Button("Clear");
-        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, raysTogg);
+        TextField brushSize = new TextField("5");
+        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, raysTogg, brushSize);
 
         ToolBar toolBar = new ToolBar(
                 raysTogg,  //Eventually have many options in a toggleGroup
                 clearButt,
                 new Button("Save"),
                 new Separator(Orientation.VERTICAL),
-                new Button("Clean"),
+                brushSize,
                 new Button("Compile"),
                 new Button("Run"),
                 new Separator(Orientation.VERTICAL),
@@ -96,13 +97,14 @@ public class Main extends Application {
         return monitored;
     }
 
-    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground, Button clear, ToggleButton rays) {
+    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground, Button clear, ToggleButton rays, TextField brushSize) {
         final Canvas canvas = new Canvas(560, 400);
+        double size = 5;
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(colorPickerBackground.getValue());
         gc.fillRect(0, 0, 560, 400);
         gc.setFill(colorPicker1.getValue());
-        gc.setLineWidth(5);
+        gc.setLineWidth(size);
 
         clear.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
@@ -127,8 +129,10 @@ public class Main extends Application {
         canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                gc.setFill(colorPicker1.getValue());
-                gc.fillRect(event.getX(), event.getY(), 10, 10);
+                if (rays.isSelected() == false) {
+                    gc.setFill(colorPicker1.getValue());
+                    gc.fillOval(event.getX() - (size / 2), event.getY() - (size / 2), size, size);
+                }
             }
         });
 
@@ -137,19 +141,14 @@ public class Main extends Application {
             public void handle(MouseEvent event) {
                 if (rays.isSelected() == true) {
                     gc.setStroke(colorPicker1.getValue());
+                    gc.setLineWidth(1);
                     gc.strokeLine(iXCoor, iYCoor, event.getX(), event.getY());
+                    gc.setLineWidth(size);
                 } else {
                     gc.setStroke(colorPicker1.getValue());
                     gc.lineTo(event.getX(), event.getY());
                     gc.stroke();
                 }
-            }
-        });
-
-        canvas.setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                gc.closePath();
             }
         });
 
