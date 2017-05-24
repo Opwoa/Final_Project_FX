@@ -26,9 +26,10 @@ public class Main extends Application {
         final Label reporter = new Label(OUTSIDE_TEXT);
         Label monitored = createMonitoredLabel(reporter);
         ColorPicker colorPicker1 = new ColorPicker(Color.BLACK);
+        ColorPicker colorPickerBackground = new ColorPicker(Color.BLACK);
         ToggleButton raysTogg = new ToggleButton("Rays");
         Button clearButt = new Button("Clear");
-        Canvas canvas = createCanvas(colorPicker1, clearButt, raysTogg);
+        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, raysTogg);
 
         ToolBar toolBar = new ToolBar(
                 raysTogg,  //Eventually have many options in a toggleGroup
@@ -41,7 +42,8 @@ public class Main extends Application {
                 new Separator(Orientation.VERTICAL),
                 new Button("Debug"),
                 new Button("Profile"),
-                colorPicker1
+                colorPicker1,
+                colorPickerBackground
         );
 
         VBox layout = new VBox(10);
@@ -94,16 +96,16 @@ public class Main extends Application {
         return monitored;
     }
 
-    private Canvas createCanvas(ColorPicker colorPicker1, Button clear, ToggleButton rays) {
+    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground, Button clear, ToggleButton rays) {
         final Canvas canvas = new Canvas(560, 400);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITE);
+        gc.setFill(colorPickerBackground.getValue());
         gc.fillRect(0, 0, 560, 400);
         gc.setFill(colorPicker1.getValue());
 
         clear.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                gc.setFill(Color.WHITE);
+                gc.setFill(colorPickerBackground.getValue());
                 gc.fillRect(0, 0, 560, 400);
             }
         });
