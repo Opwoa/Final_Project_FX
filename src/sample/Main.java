@@ -26,7 +26,7 @@ public class Main extends Application {
         final Label reporter = new Label(OUTSIDE_TEXT);
         Label monitored = createMonitoredLabel(reporter);
         ColorPicker colorPicker1 = new ColorPicker(Color.BLACK);
-        ColorPicker colorPickerBackground = new ColorPicker(Color.BLACK);
+        ColorPicker colorPickerBackground = new ColorPicker(Color.WHITE);
         ToggleButton raysTogg = new ToggleButton("Rays");
         Button clearButt = new Button("Clear");
         Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, raysTogg);
@@ -102,6 +102,7 @@ public class Main extends Application {
         gc.setFill(colorPickerBackground.getValue());
         gc.fillRect(0, 0, 560, 400);
         gc.setFill(colorPicker1.getValue());
+        gc.setLineWidth(5);
 
         clear.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
@@ -113,8 +114,13 @@ public class Main extends Application {
         canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                iXCoor = event.getX();
-                iYCoor = event.getY();
+                if (rays.isSelected() == true) {
+                    iXCoor = event.getX();
+                    iYCoor = event.getY();
+                } else {
+                    gc.beginPath();
+                    gc.moveTo(event.getX(), event.getY());
+                }
             }
         });
 
@@ -133,9 +139,17 @@ public class Main extends Application {
                     gc.setStroke(colorPicker1.getValue());
                     gc.strokeLine(iXCoor, iYCoor, event.getX(), event.getY());
                 } else {
-                    gc.setFill(colorPicker1.getValue());
-                    gc.fillRect(event.getX(), event.getY(), 10, 10);
+                    gc.setStroke(colorPicker1.getValue());
+                    gc.lineTo(event.getX(), event.getY());
+                    gc.stroke();
                 }
+            }
+        });
+
+        canvas.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                gc.closePath();
             }
         });
 
