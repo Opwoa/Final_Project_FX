@@ -116,6 +116,14 @@ public class Main extends Application {
             }
         });
 
+        canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                gc.setFill(colorPicker1.getValue());
+                gc.fillRect(event.getX(), event.getY(), 10, 10);
+            }
+        });
+
         canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
