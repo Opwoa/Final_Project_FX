@@ -27,22 +27,26 @@ public class Main extends Application {
         Label monitored = createMonitoredLabel(reporter);
         ColorPicker colorPicker1 = new ColorPicker(Color.BLACK);
         ColorPicker colorPickerBackground = new ColorPicker(Color.WHITE);
+        ToggleButton drawTogg = new ToggleButton("Regular Draw");
         ToggleButton raysTogg = new ToggleButton("Rays");
+        ToggleButton eraserTogg = new ToggleButton("Eraser");
+        ToggleGroup group = new ToggleGroup();
+        drawTogg.setToggleGroup(group);
+        raysTogg.setToggleGroup(group);
+        eraserTogg.setToggleGroup(group);
+        drawTogg.setSelected(true);
         Button clearButt = new Button("Clear");
         TextField brushSize = new TextField("5");
-        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, raysTogg, brushSize);
+        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, drawTogg, raysTogg, eraserTogg, brushSize);
 
         ToolBar toolBar = new ToolBar(
-                raysTogg,  //Eventually have many options in a toggleGroup
+                drawTogg,
+                raysTogg,
+                eraserTogg,//Eventually have many options in a toggleGroup
                 clearButt,
-                new Button("Save"),
                 new Separator(Orientation.VERTICAL),
                 brushSize,
-                new Button("Compile"),
-                new Button("Run"),
                 new Separator(Orientation.VERTICAL),
-                new Button("Debug"),
-                new Button("Profile"),
                 colorPicker1,
                 colorPickerBackground
         );
@@ -97,7 +101,7 @@ public class Main extends Application {
         return monitored;
     }
 
-    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground, Button clear, ToggleButton rays, TextField brushSize) {
+    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground, Button clear, ToggleButton draw, ToggleButton rays, ToggleButton eraser, TextField brushSize) {
         final Canvas canvas = new Canvas(560, 400);
         double size = 5;
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -130,8 +134,14 @@ public class Main extends Application {
             @Override
             public void handle(MouseEvent event) {
                 if (rays.isSelected() == false) {
-                    gc.setFill(colorPicker1.getValue());
-                    gc.fillOval(event.getX() - (size / 2), event.getY() - (size / 2), size, size);
+                    if (eraser.isSelected() == true) {
+                        gc.setFill(colorPickerBackground.getValue());
+                        gc.fillOval(event.getX() - (size / 2), event.getY() - (size / 2), size, size);
+                    }
+                    else {
+                        gc.setFill(colorPicker1.getValue());
+                        gc.fillOval(event.getX() - (size / 2), event.getY() - (size / 2), size, size);
+                    }
                 }
             }
         });
@@ -144,7 +154,12 @@ public class Main extends Application {
                     gc.setLineWidth(1);
                     gc.strokeLine(iXCoor, iYCoor, event.getX(), event.getY());
                     gc.setLineWidth(size);
-                } else {
+                } else if (eraser.isSelected() == true) {
+                    gc.setStroke(colorPickerBackground.getValue());
+                    gc.lineTo(event.getX(), event.getY());
+                    gc.stroke();
+                }
+                else if (draw.isSelected() == true) {
                     gc.setStroke(colorPicker1.getValue());
                     gc.lineTo(event.getX(), event.getY());
                     gc.stroke();
