@@ -15,6 +15,7 @@ import javafx.stage.*;
 import javafx.scene.*;
 import javafx.scene.paint.*;
 import javafx.scene.canvas.*;
+import javafx.scene.control.Slider;
 
 public class Main extends Application {
     private static final String OUTSIDE_TEXT = "Outside Label";
@@ -25,8 +26,10 @@ public class Main extends Application {
     @Override public void start(final Stage stage) {
         final Label reporter = new Label(OUTSIDE_TEXT);
         Label monitored = createMonitoredLabel(reporter);
+        //color pickers
         ColorPicker colorPicker1 = new ColorPicker(Color.BLACK);
         ColorPicker colorPickerBackground = new ColorPicker(Color.WHITE);
+        //toggle buttons and group
         ToggleButton drawTogg = new ToggleButton("Regular Draw");
         ToggleButton raysTogg = new ToggleButton("Rays");
         ToggleButton eraserTogg = new ToggleButton("Eraser");
@@ -35,9 +38,18 @@ public class Main extends Application {
         raysTogg.setToggleGroup(group);
         eraserTogg.setToggleGroup(group);
         drawTogg.setSelected(true);
+        //buttons
         Button clearButt = new Button("Clear");
-        TextField brushSize = new TextField("5");
-        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, drawTogg, raysTogg, eraserTogg, brushSize);
+        //Sliders
+        Slider slider = new Slider(0, 25, 5);
+        slider.setShowTickMarks(true);
+        slider.setShowTickLabels(true);
+        slider.setSnapToTicks(true);
+        slider.setMajorTickUnit(5f);
+        slider.setBlockIncrement(1f);
+
+        //create the canvas using all inputs as parameters
+        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, drawTogg, raysTogg, eraserTogg, slider);
 
         ToolBar toolBar = new ToolBar(
                 drawTogg,
@@ -45,7 +57,7 @@ public class Main extends Application {
                 eraserTogg,//Eventually have many options in a toggleGroup
                 clearButt,
                 new Separator(Orientation.VERTICAL),
-                brushSize,
+                slider,
                 new Separator(Orientation.VERTICAL),
                 colorPicker1,
                 colorPickerBackground
@@ -101,14 +113,17 @@ public class Main extends Application {
         return monitored;
     }
 
-    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground, Button clear, ToggleButton draw, ToggleButton rays, ToggleButton eraser, TextField brushSize) {
+    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground,
+                                Button clear, ToggleButton draw, ToggleButton rays, ToggleButton eraser,
+                                Slider brushSlider) {
         final Canvas canvas = new Canvas(560, 400);
-        double size = 5;
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(colorPickerBackground.getValue());
         gc.fillRect(0, 0, 560, 400);
         gc.setFill(colorPicker1.getValue());
-        gc.setLineWidth(size);
+        gc.setLineWidth(brushSlider.getValue());
+        gc.setLineCap(StrokeLineCap.ROUND);
+        gc.setLineJoin(StrokeLineJoin.ROUND);
 
         clear.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
@@ -136,11 +151,11 @@ public class Main extends Application {
                 if (rays.isSelected() == false) {
                     if (eraser.isSelected() == true) {
                         gc.setFill(colorPickerBackground.getValue());
-                        gc.fillOval(event.getX() - (size / 2), event.getY() - (size / 2), size, size);
+                        gc.fillOval(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
                     }
                     else {
                         gc.setFill(colorPicker1.getValue());
-                        gc.fillOval(event.getX() - (size / 2), event.getY() - (size / 2), size, size);
+                        gc.fillOval(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
                     }
                 }
             }
@@ -153,17 +168,26 @@ public class Main extends Application {
                     gc.setStroke(colorPicker1.getValue());
                     gc.setLineWidth(1);
                     gc.strokeLine(iXCoor, iYCoor, event.getX(), event.getY());
-                    gc.setLineWidth(size);
+                    gc.setLineWidth(brushSlider.getValue());
                 } else if (eraser.isSelected() == true) {
                     gc.setStroke(colorPickerBackground.getValue());
                     gc.lineTo(event.getX(), event.getY());
+                    gc.setLineWidth(brushSlider.getValue());
                     gc.stroke();
                 }
                 else if (draw.isSelected() == true) {
                     gc.setStroke(colorPicker1.getValue());
                     gc.lineTo(event.getX(), event.getY());
+                    gc.setLineWidth(brushSlider.getValue());
                     gc.stroke();
                 }
+            }
+        });
+
+        canvas.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                gc.closePath();
             }
         });
 
@@ -172,13 +196,7 @@ public class Main extends Application {
                 reporter.setText(OUTSIDE_TEXT);
             }
         });
-
-        monitored.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Circle circle = new Circle(event.getX(), event.getX(), 5, Color.BLACK);
-            }
-        });*/
+        */
 
         return canvas;
     }
