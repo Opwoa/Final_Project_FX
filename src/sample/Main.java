@@ -16,6 +16,9 @@ import javafx.scene.*;
 import javafx.scene.paint.*;
 import javafx.scene.canvas.*;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.Pane.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.BorderPane;
 
 public class Main extends Application {
     private static final String OUTSIDE_TEXT = "Outside Label";
@@ -62,22 +65,46 @@ public class Main extends Application {
                 colorPicker1,
                 colorPickerBackground
         );
+        BorderPane border = new BorderPane();
+        border.setRight(addFlowPane());
+        border.setCenter(canvas);
+        border.setTop(toolBar);
 
-        VBox layout = new VBox(10);
+        /*VBox layout = new VBox(10);
         layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 20px;");
         layout.getChildren().setAll(
-                toolBar,
-                canvas,
-                reporter
+            toolBar,
+            canvas,
+             reporter
         );
-        layout.setPrefWidth(600);
+        layout.setPrefWidth(600);*/
 
         stage.setScene(
-                new Scene(layout)
+                new Scene(border)
         );
 
         stage.show();
     }
+
+    public FlowPane addFlowPane() {
+        FlowPane flow = new FlowPane();
+        // flow.setPadding(new Insets(5, 0, 5, 0));
+        flow.setVgap(4);
+        flow.setHgap(4);
+        flow.setPrefWrapLength(170); // preferred width allows for two columns
+        flow.setStyle("-fx-background-color: DAE6F3;");
+
+        //ImageView pages[] = new ImageView[8];
+        for (int i=0; i<8; i++) {
+            //pages[i] = new ImageView(
+            //new Image(LayoutSample.class.getResourceAsStream(
+            // "graphics/chart_"+(i+1)+".png";)));
+            //flow.getChildren().add(pages[i]);
+        }
+
+        return flow;
+    }
+
 
     private Label createMonitoredLabel(final Label reporter) {
         final Label monitored = new Label();
