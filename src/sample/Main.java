@@ -19,6 +19,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
 public class Main extends Application {
     private static final String OUTSIDE_TEXT = "Outside Label";
@@ -31,7 +32,7 @@ public class Main extends Application {
         Label monitored = createMonitoredLabel(reporter);
         //color pickers
         ColorPicker colorPicker1 = new ColorPicker(Color.BLACK);
-        ColorPicker colorPickerBackground = new ColorPicker(Color.WHITE);
+        ColorPicker colorPickerBackground = new ColorPicker(Color.BLUE);
         //toggle buttons and group
         ToggleButton drawTogg = new ToggleButton("Regular Draw");
         ToggleButton raysTogg = new ToggleButton("Rays");
@@ -52,12 +53,13 @@ public class Main extends Application {
         slider.setBlockIncrement(1f);
 
         //create the canvas using all inputs as parameters
-        Canvas canvas = createCanvas(colorPicker1, colorPickerBackground, clearButt, drawTogg, raysTogg, eraserTogg, slider);
+        Canvas background = createBackground(colorPickerBackground);
+        Canvas canvas = createCanvas(colorPicker1, clearButt, drawTogg, raysTogg, eraserTogg, slider);
 
         ToolBar toolBar = new ToolBar(
                 drawTogg,
                 raysTogg,
-                eraserTogg,//Eventually have many options in a toggleGroup
+                eraserTogg,
                 clearButt,
                 new Separator(Orientation.VERTICAL),
                 slider,
@@ -65,19 +67,14 @@ public class Main extends Application {
                 colorPicker1,
                 colorPickerBackground
         );
+
+        StackPane stack = new StackPane();
+        stack.getChildren().addAll(background, canvas);
+
         BorderPane border = new BorderPane();
         border.setRight(addFlowPane());
-        border.setCenter(canvas);
+        border.setCenter(stack);
         border.setTop(toolBar);
-
-        /*VBox layout = new VBox(10);
-        layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 20px;");
-        layout.getChildren().setAll(
-            toolBar,
-            canvas,
-             reporter
-        );
-        layout.setPrefWidth(600);*/
 
         stage.setScene(
                 new Scene(border)
@@ -86,7 +83,7 @@ public class Main extends Application {
         stage.show();
     }
 
-    public FlowPane addFlowPane() {
+    private FlowPane addFlowPane() {
         FlowPane flow = new FlowPane();
         // flow.setPadding(new Insets(5, 0, 5, 0));
         flow.setVgap(4);
@@ -140,14 +137,30 @@ public class Main extends Application {
         return monitored;
     }
 
-    private Canvas createCanvas(ColorPicker colorPicker1, ColorPicker colorPickerBackground,
+    private Canvas createBackground(ColorPicker colorPickerBackground) {
+        final Canvas background = new Canvas(560, 400);
+
+        GraphicsContext gc = background.getGraphicsContext2D();
+        gc.setFill(colorPickerBackground.getValue());
+        gc.fillRect(0, 0, 560, 400);
+
+        colorPickerBackground.setOnHiding(new EventHandler<Event>() {
+            @Override public void handle(Event e) {
+                gc.setFill(colorPickerBackground.getValue());
+                gc.fillRect(0, 0, 560, 400);
+            }
+        });
+
+        return background;
+    }
+
+    private Canvas createCanvas(ColorPicker colorPicker1,
                                 Button clear, ToggleButton draw, ToggleButton rays, ToggleButton eraser,
                                 Slider brushSlider) {
         final Canvas canvas = new Canvas(560, 400);
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(colorPickerBackground.getValue());
-        gc.fillRect(0, 0, 560, 400);
+        gc.clearRect(0, 0, 560, 400);
         gc.setStroke(colorPicker1.getValue());
         gc.setLineWidth(brushSlider.getValue());
         gc.setLineCap(StrokeLineCap.ROUND);
@@ -155,8 +168,7 @@ public class Main extends Application {
 
         clear.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                gc.setFill(colorPickerBackground.getValue());
-                gc.fillRect(0, 0, 560, 400);
+                gc.clearRect(0, 0, 560, 400);
             }
         });
 
@@ -178,8 +190,7 @@ public class Main extends Application {
             public void handle(MouseEvent event) {
                 if (rays.isSelected() == false) {
                     if (eraser.isSelected() == true) {
-                        gc.setFill(colorPickerBackground.getValue());
-                        gc.fillOval(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
+                        gc.clearRect(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
                     }
                     else {
                         gc.setFill(colorPicker1.getValue());
@@ -198,10 +209,7 @@ public class Main extends Application {
                     gc.strokeLine(iXCoor, iYCoor, event.getX(), event.getY());
                     gc.setLineWidth(brushSlider.getValue());
                 } else if (eraser.isSelected() == true) {
-                    gc.setStroke(colorPickerBackground.getValue());
-                    gc.lineTo(event.getX(), event.getY());
-                    gc.setLineWidth(brushSlider.getValue());
-                    gc.stroke();
+                    gc.clearRect(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
                 }
                 else if (draw.isSelected() == true) {
                     gc.setStroke(colorPicker1.getValue());
@@ -218,13 +226,6 @@ public class Main extends Application {
                 gc.closePath();
             }
         });
-
-        /*monitored.setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override public void handle(MouseEvent event) {
-                reporter.setText(OUTSIDE_TEXT);
-            }
-        });
-        */
 
         return canvas;
     }
