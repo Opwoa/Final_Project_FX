@@ -32,7 +32,7 @@ public class Main extends Application {
         Label monitored = createMonitoredLabel(reporter);
         //color pickers
         ColorPicker colorPicker1 = new ColorPicker(Color.BLACK);
-        ColorPicker colorPickerBackground = new ColorPicker(Color.BLUE);
+        ColorPicker colorPickerBackground = new ColorPicker(Color.WHITE);
         //toggle buttons and group
         ToggleButton drawTogg = new ToggleButton("Regular Draw");
         ToggleButton raysTogg = new ToggleButton("Rays");
@@ -138,16 +138,16 @@ public class Main extends Application {
     }
 
     private Canvas createBackground(ColorPicker colorPickerBackground) {
-        final Canvas background = new Canvas(560, 400);
+        final Canvas background = new Canvas(568, 400);
 
         GraphicsContext gc = background.getGraphicsContext2D();
         gc.setFill(colorPickerBackground.getValue());
-        gc.fillRect(0, 0, 560, 400);
+        gc.fillRect(0, 0, 568, 400);
 
         colorPickerBackground.setOnHiding(new EventHandler<Event>() {
             @Override public void handle(Event e) {
                 gc.setFill(colorPickerBackground.getValue());
-                gc.fillRect(0, 0, 560, 400);
+                gc.fillRect(0, 0, 568, 400);
             }
         });
 
@@ -157,10 +157,10 @@ public class Main extends Application {
     private Canvas createCanvas(ColorPicker colorPicker1,
                                 Button clear, ToggleButton draw, ToggleButton rays, ToggleButton eraser,
                                 Slider brushSlider) {
-        final Canvas canvas = new Canvas(560, 400);
+        final Canvas canvas = new Canvas(568, 400);
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, 560, 400);
+        gc.clearRect(0, 0, 568, 400);
         gc.setStroke(colorPicker1.getValue());
         gc.setLineWidth(brushSlider.getValue());
         gc.setLineCap(StrokeLineCap.ROUND);
@@ -168,7 +168,7 @@ public class Main extends Application {
 
         clear.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                gc.clearRect(0, 0, 560, 400);
+                gc.clearRect(0, 0, 568, 400);
             }
         });
 
