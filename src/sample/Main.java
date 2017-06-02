@@ -117,10 +117,11 @@ public class Main extends Application {
                                 Button clear, ToggleButton draw, ToggleButton rays, ToggleButton eraser,
                                 Slider brushSlider) {
         final Canvas canvas = new Canvas(560, 400);
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(colorPickerBackground.getValue());
         gc.fillRect(0, 0, 560, 400);
-        gc.setFill(colorPicker1.getValue());
+        gc.setStroke(colorPicker1.getValue());
         gc.setLineWidth(brushSlider.getValue());
         gc.setLineCap(StrokeLineCap.ROUND);
         gc.setLineJoin(StrokeLineJoin.ROUND);
