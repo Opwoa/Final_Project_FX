@@ -54,7 +54,7 @@ public class Main extends Application {
 
         //create the canvas using all inputs as parameters
         Canvas background = createBackground(colorPickerBackground);
-        Canvas canvas = createCanvas(colorPicker1, clearButt, drawTogg, raysTogg, eraserTogg, slider);
+        Canvas canvas = createCanvas(colorPicker1, clearButt, new Button(), drawTogg, raysTogg, eraserTogg, slider);
 
         ToolBar toolBar = new ToolBar(
                 drawTogg,
@@ -157,9 +157,10 @@ public class Main extends Application {
     }
 
     private Canvas createCanvas(ColorPicker colorPicker1,
-                                Button clear, ToggleButton draw, ToggleButton rays, ToggleButton eraser,
+                                Button clear,Button undo, ToggleButton draw, ToggleButton rays, ToggleButton eraser,
                                 Slider brushSlider) {
-        final Canvas canvas = new Canvas(568, 400);
+        Canvas canvas = new Canvas(568, 400);
+        Canvas backup = new Canvas(568, 400);
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, 568, 400);
@@ -177,27 +178,20 @@ public class Main extends Application {
         canvas.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+
                 if (rays.isSelected() == true) {
                     iXCoor = event.getX();
                     iYCoor = event.getY();
-                } else {
+                } else if (eraser.isSelected() == true) {
                     gc.beginPath();
                     gc.moveTo(event.getX(), event.getY());
+                    gc.clearRect(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
                 }
-            }
-        });
-
-        canvas.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (rays.isSelected() == false) {
-                    if (eraser.isSelected() == true) {
-                        gc.clearRect(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
-                    }
-                    else {
-                        gc.setFill(colorPicker1.getValue());
-                        gc.fillOval(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
-                    }
+                else {
+                    gc.beginPath();
+                    gc.moveTo(event.getX(), event.getY());
+                    gc.setFill(colorPicker1.getValue());
+                    gc.fillOval(event.getX() - (brushSlider.getValue() / 2), event.getY() - (brushSlider.getValue() / 2), brushSlider.getValue(), brushSlider.getValue());
                 }
             }
         });
