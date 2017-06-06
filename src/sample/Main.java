@@ -64,7 +64,9 @@ public class Main extends Application {
                 new Separator(Orientation.VERTICAL),
                 slider,
                 new Separator(Orientation.VERTICAL),
+                new Label("Brush Color:"),
                 colorPicker1,
+                new Label("Background Color:"),
                 colorPickerBackground
         );
 
